@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
+    --primary: 215 60% 35%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 195 40% 45%;
+    --secondary-foreground: 195 40% 98%;
+    --muted: 210 15% 94%;
+    --muted-foreground: 215 15% 45%;
+    --accent: 195 40% 92%;
+    --accent-foreground: 195 40% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 15% 90%;
+    --input: 215 15% 90%;
+    --ring: 215 60% 35%;
+    --radius: 1.25rem;
+    --chart-1: 215 60% 35%;
+    --chart-2: 195 40% 45%;
+    --chart-3: 210 20% 25%;
+    --chart-4: 45 85% 60%;
+    --chart-5: 15 85% 60%;
+  }
+  .dark {
+    --background: 220 30% 6%;
+    --foreground: 210 20% 95%;
+    --card: 220 30% 10%;
+    --card-foreground: 210 20% 95%;
+    --popover: 220 30% 10%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 215 60% 50%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 195 40% 55%;
+    --secondary-foreground: 195 40% 98%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 215 15% 70%;
+    --accent: 195 40% 20%;
+    --accent-foreground: 195 40% 95%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 20% 15%;
+    --input: 220 20% 15%;
+    --ring: 215 60% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body tracking-tight;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline font-bold tracking-tight;
+  }
+}
+
+@keyframes word-fall {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100% - 20px));
+    opacity: 0;
+  }
+}
+
+.animate-word-fall {
+  animation: word-fall linear forwards;
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl shadow-black/5;
+}
