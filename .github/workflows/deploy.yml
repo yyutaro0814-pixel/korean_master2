@@ -1,7 +1,11 @@
 name: Deploy to GitHub Pages
 on:
   push:
-    branches: [ main ] # 山口さんのブランチ名が master ならここを master に
+    branches: [ main ]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,18 +15,12 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter build web --base-href "/${{ github.event.repository.name }}/"
-      - uses: actions/upload-pages-artifact@v2
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
