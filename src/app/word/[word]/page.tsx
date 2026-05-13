@@ -35,7 +35,8 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
   };
 
   const playAudio = () => {
-    const audioUrl = definition?.phonetics.find(p => p.audio)?.audio;
+    const audioUrl = definition?.phonetics.find((p: any) => p.audio)?.audio;
+
     if (audioUrl) {
       new Audio(audioUrl).play();
     }
