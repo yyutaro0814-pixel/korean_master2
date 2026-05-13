@@ -41,6 +41,22 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
+        /* メニューと中身が重ならないようにする魔法のコード */
+@media (max-width: 768px) {
+    aside {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+    }
+    main {
+        padding: 10px !important;
+    }
+    .flex.h-screen {
+        flex-direction: column !important;
+        overflow-y: auto !important;
+    }
+}
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
