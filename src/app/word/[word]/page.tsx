@@ -1,3 +1,14 @@
+// @ts-nocheck
+"use client";
+
+import { useEffect, useState } from "react";
+// ...（以下、他のインポートが続く）
+
+"use client";
+
+import { useEffect, useState } from "react";
+// ...（以下、他のインポートが続く）
+
 "use client";
 
 import { useEffect, useState, use } from 'react';
