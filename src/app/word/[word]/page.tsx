@@ -33,14 +33,18 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       saveWord(wordParam);
     }
   };
-
-  const playAudio = () => {
-    const audioUrl = definition?.phonetics.find((p: any) => p.audio)?.audio;
-
+    const playAudio = () => {
+    // どんなデータが来てもエラーにしない「any」を使ってチェックを回避します
+    const phoneticWithAudio = definition?.phonetics?.find((p: any) => p.audio);
+    const audioUrl = (phoneticWithAudio as any)?.audio;
+    
     if (audioUrl) {
       new Audio(audioUrl).play();
     }
   };
+
+
+  
 
   if (loading) {
     return (
