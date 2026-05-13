@@ -160,10 +160,6 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     </div>
   );
 }
-// GitHub Pages（静的エクスポート）のために、事前に書き出す単語を指定します
-export async function generateStaticParams() {
-  // とりあえず「hello」という単語のページだけ作っておく設定です
-  // 実際には検索した時にデータが取得されるので、これだけでOKです
-  return [{ word: 'hello' }];
-}
+
+　
 
