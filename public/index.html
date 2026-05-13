@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>ハングル・マスター | モダン韓国語学習</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        background: '#ffffff',
+                        foreground: '#0f172a',
+                        card: '#ffffff',
+                        border: '#e2e8f0',
+                        muted: '#f1f5f9',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                        headline: ['Noto Sans JP', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .gradient-text { background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body className="font-sans text-foreground bg-slate-50 antialiased overflow-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useCallback } = React;
+
+        // --- Data ---
+        const COMMON_WORDS = ["안녕하세요", "감사합니다", "친구", "사랑", "행복", "노력", "열정", "희망", "추억", "우주", "바다", "하늘", "미소", "노래", "마음"];
+        
+        const EASY_WORDS_POOL = [
+            { w: "안녕하세요", c: "こんにちは", e: "안녕하세요, 만나서 반가워요.", t: "こんにちは、お会いできて嬉しいです。" },
+            { w: "감사합니다", c: "ありがとうございます", e: "도와주셔서 감사합니다.", t: "助けてくれてありがとうございます。" },
+            { w: "친구", c: "友達", e: "그는 나의 가장 친한 친구입니다.", t: "彼は私の親友です。" },
+            { w: "학교", c: "学校", e: "학교에 가요.", t: "学校に行きます。" },
+            { w: "우유", c: "牛乳", e: "카페라떼에 우유를 넣어요.", t: "カフェラテに牛乳を入れます。" },
+            { w: "사과", c: "りんご / 謝罪", e: "맛있는 사과를 먹어요.", t: "美味しいりんごを食べます。" },
+            { w: "물", c: "水", e: "물을 마시고 싶어요.", t: "水が飲みたいです。" },
+            { w: "날씨", c: "天気", e: "오늘 날씨가 정말 좋아요.", t: "今日は天気が本当に良いです。" },
+            { w: "가족", c: "家族", e: "가족과 함께 시간을 보내요.", t: "家族と一緒に時間を過ごします。" },
+            { w: "선생님", c: "先生", e: "선생님, 질문이 있어요.", t: "先生、質問があります。" },
+            { w: "이름", c: "名前", e: "이름이 뭐예요?", t: "お名前は何ですか？" },
+            { w: "오늘", c: "今日", e: "오늘은 회사에 안 가요.", t: "今日は会社に行きません。" },
+            { w: "한국어", c: "韓国語", e: "한국어 공부를 시작했어요.", t: "韓国語の勉強を始めました。" },
+            { w: "옷", c: "服", e: "새 옷을 샀어요.", t: "新しい服を買いました。" },
+            { w: "집", c: "家", e: "우리 집은 서울에 있어요.", t: "私の家はソウルにあります。" }
+        ];
+
+        const NORMAL_WORDS_POOL = [
+            { w: "노력", c: "努力", e: "노력은 배신하지 않아요.", t: "努力は裏切りません。" },
+            { w: "열정", c: "情熱", e: "그는 일에 대한 열정이 대단해요.", t: "彼は仕事に対する情熱がすごいです。" },
+            { w: "희망", c: "希望", e: "어떤 상황에서도 희망을 잃지 마세요.", t: "どんな状況でも希望を失わないでください。" },
+            { w: "추억", c: "思い出", e: "우리는 많은 추억을 만들었어요.", t: "私たちはたくさんの思い出を作りました。" },
+            { w: "결과", c: "結果", e: "노력한 만큼 좋은 결과가 나왔어요.", t: "努力した分だけ良い結果が出ました。" },
+            { w: "건강", c: "健康", e: "건강을 위해 매일 운동해요.", t: "健康のために毎日運動します。" },
+            { w: "약속", c: "約束 / 予約", e: "오늘 저녁에 약속이 있어요.", t: "今日の夕方に約束があります。" }
+        ];
+
+        const HARD_WORDS_POOL = [
+            { w: "경제", c: "経済", e: "최근 경제 상황이 좋지 않아요.", t: "最近の経済状況が良くないです。" },
+            { w: "기술", c: "技術", e: "새로운 기술이 세상을 바꾸고 있어요.", t: "新しい技術が世界を変えています。" },
+            { w: "정의", c: "正義", e: "사회 정의를 실현하기 위해 노력해요.", t: "社会正義を実現するために努力します。" },
+            { w: "혁신", c: "革新", e: "기술 혁신이 산업 지형을 바꿉니다.", t: "技術革新が産業の地形を変えます。" },
+            { w: "심리", c: "心理", e: "타인의 심리를 이해하는 것은 쉽지 않아요.", t: "他人の心理を理解することは簡単ではありません。" }
+        ];
+
+        // --- Firebase Init ---
+        // (Simplified for static usage)
+        const firebaseConfig = {
+            projectId: "studio-969761797-88e6a",
+            appId: "1:867142606587:web:7d94c0e2626d5a212e5a5e",
+            apiKey: "AIzaSyBs46qoVejRqT6En8u-MBpgstN-rGmaLf0",
+            authDomain: "studio-969761797-88e6a.firebaseapp.com",
+            storageBucket: "studio-969761797-88e6a.firebasestorage.app",
+            messagingSenderId: "867142606587"
+        };
+
+        // --- Icons Helper ---
+        const Icon = ({ name, ...props }) => {
+            const [icon, setIcon] = useState(null);
+            useEffect(() => {
+                const lucideIcon = lucide.icons[name];
+                if (lucideIcon) setIcon(lucideIcon);
+            }, [name]);
+            
+            if (!icon) return <div style={{ width: props.size || 24, height: props.size || 24 }} />;
+            
+            const SvgIcon = icon;
+            return <i data-lucide={name} {...props}></i>;
+        };
+        
+        // Lucide replacement for simple usage
+        const LucideIcon = ({ name, size = 24, className = "" }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            });
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        // --- Components ---
+
+        const Navigation = ({ activeTab, setActiveTab }) => {
+            const links = [
+                { id: 'dashboard', icon: 'layout-dashboard', label: 'ダッシュボード' },
+                { id: 'game', icon: 'gamepad-2', label: 'トレーニング' },
+                { id: 'saved', icon: 'bookmark', label: '保存済み' },
+            ];
+
+            return (
+                <nav className="flex md:flex-col h-full items-center md:items-stretch gap-6 py-6 px-4 md:px-6">
+                    <div className="hidden md:flex items-center gap-3 px-2 mb-10">
+                        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <span className="text-xl font-bold">한</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-lg font-bold tracking-tight">ハングルマスター</span>
+                            <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Korean Edition</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex md:flex-col gap-2 flex-1">
+                        {links.map((link) => (
+                            <button
+                                key={link.id}
+                                onClick={() => setActiveTab(link.id)}
+                                className={`group flex flex-col md:flex-row items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+                                    activeTab === link.id 
+                                        ? "bg-blue-600 text-white shadow-lg" 
+                                        : "text-slate-500 hover:bg-slate-100"
+                                }`}
+                            >
+                                <LucideIcon name={link.icon} size={20} />
+                                <span className="text-[10px] md:text-sm font-bold">{link.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </nav>
+            );
+        };
+
+        const Dashboard = () => {
+            const [dailyWord, setDailyWord] = useState('');
+            useEffect(() => {
+                setDailyWord(COMMON_WORDS[Math.floor(Math.random() * COMMON_WORDS.length)]);
+            }, []);
+
+            return (
+                <div className="space-y-12 animate-in fade-in duration-700">
+                    <header className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
+                            <LucideIcon name="graduation-cap" size={14} />
+                            語彙力をレベルアップ
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-black leading-tight">
+                            안녕하세요. <br />
+                            <span className="text-slate-400 font-medium">韓国語の世界へようこそ。</span>
+                        </h1>
+                    </header>
+
+                    <div className="relative group max-w-2xl">
+                        <div className="flex items-center p-2 rounded-3xl bg-white border-2 border-slate-100 shadow-xl focus-within:border-blue-500/30 transition-all">
+                            <div className="pl-4 text-slate-400"><LucideIcon name="search" size={24} /></div>
+                            <input 
+                                type="text" 
+                                placeholder="単語を検索..." 
+                                className="flex-1 h-12 px-4 text-lg border-none focus:ring-0 outline-none"
+                            />
+                            <button className="bg-slate-900 text-white px-6 h-12 rounded-2xl font-bold hover:bg-slate-800 transition-all">検索</button>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[100px] pointer-events-none"></div>
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                            <div className="space-y-4">
+                                <span className="text-[10px] uppercase tracking-widest font-black text-blue-400">今日の単語</span>
+                                <h2 className="text-5xl md:text-7xl font-bold tracking-tighter">{dailyWord}</h2>
+                                <p className="text-slate-400 max-w-sm">この単語の詳しい使い方やネイティブのニュアンスをチェックしてみましょう。</p>
+                            </div>
+                            <button className="bg-white text-slate-900 px-8 h-16 rounded-2xl font-bold flex items-center gap-3 hover:translate-x-1 transition-transform shadow-xl">
+                                詳しく見る <LucideIcon name="arrow-right" size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 text-blue-600 group-hover:scale-110 transition-transform">
+                                <LucideIcon name="book-marked" size={24} />
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">マイ・ライブラリ</h3>
+                            <p className="text-slate-500 text-sm">保存した単語を整理して、いつでも復習。自分だけの辞書を作りましょう。</p>
+                        </div>
+                        <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-6 text-purple-600 group-hover:scale-110 transition-transform">
+                                <LucideIcon name="sparkles" size={24} />
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">AI 例文エンジン</h3>
+                            <p className="text-slate-500 text-sm">文脈に合わせた自然な例文をAIが生成。生きた言葉遣いを学びます。</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Training = () => {
+            const [gameState, setGameState] = useState('selection'); // selection, playing, finished
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [score, setScore] = useState(0);
+            
+            // Mock questions
+            const questions = useMemo(() => {
+                return EASY_WORDS_POOL.map(w => {
+                    const options = [w.c];
+                    while(options.length < 4) {
+                        const random = EASY_WORDS_POOL[Math.floor(Math.random() * EASY_WORDS_POOL.length)].c;
+                        if (!options.includes(random)) options.push(random);
+                    }
+                    return { ...w, options: options.sort(() => Math.random() - 0.5) };
+                }).slice(0, 10);
+            }, []);
+
+            if (gameState === 'playing') {
+                const q = questions[currentQuestion];
+                const handleAnswer = (ans) => {
+                    if (ans === q.c) setScore(s => s + 10);
+                    if (currentQuestion < questions.length - 1) {
+                        setCurrentQuestion(c => c + 1);
+                    } else {
+                        setGameState('finished');
+                    }
+                };
+
+                return (
+                    <div className="max-w-2xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                            <span className="font-bold text-slate-400">Question {currentQuestion + 1}/10</span>
+                            <div className="h-2 w-32 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${((currentQuestion + 1) / 10) * 100}%` }}></div>
+                            </div>
+                            <span className="font-black text-blue-600">{score} PTS</span>
+                        </div>
+                        
+                        <div className="bg-slate-900 p-12 rounded-[3rem] text-white text-center space-y-4">
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-blue-400">意味を選んでください</span>
+                            <h2 className="text-6xl font-bold tracking-tighter">{q.w}</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {q.options.map(opt => (
+                                <button 
+                                    key={opt}
+                                    onClick={() => handleAnswer(opt)}
+                                    className="p-6 rounded-2xl bg-white border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all text-lg font-bold text-slate-700"
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+
+            if (gameState === 'finished') {
+                return (
+                    <div className="max-w-md mx-auto text-center space-y-8 py-12 animate-in zoom-in-95 duration-500">
+                        <div className="inline-flex items-center justify-center w-24 h-24 bg-blue-600 text-white rounded-full shadow-2xl animate-bounce">
+                            <LucideIcon name="trophy" size={48} />
+                        </div>
+                        <div className="space-y-4">
+                            <h2 className="text-4xl font-black">トレーニング完了！</h2>
+                            <p className="text-slate-500">今回のスコアは <span className="text-blue-600 font-black text-2xl">{score}</span> ポイントでした。</p>
+                        </div>
+                        <button 
+                            onClick={() => { setGameState('selection'); setCurrentQuestion(0); setScore(0); }}
+                            className="w-full bg-slate-900 text-white h-16 rounded-2xl font-bold hover:scale-105 transition-transform"
+                        >
+                            もう一度挑戦する
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="space-y-8">
+                    <div className="space-y-2">
+                        <h2 className="text-3xl font-black">難易度を選択</h2>
+                        <p className="text-slate-500">自分のレベルに合わせたトレーニングを始めましょう。</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {['easy', 'normal', 'hard'].map(level => (
+                            <button 
+                                key={level}
+                                onClick={() => setGameState('playing')}
+                                className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all text-left flex flex-col group"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                                    <LucideIcon name={level === 'easy' ? 'coffee' : level === 'normal' ? 'zap' : 'flame'} />
+                                </div>
+                                <span className="text-sm font-bold uppercase text-slate-400 mb-1">{level}</span>
+                                <h3 className="text-2xl font-bold capitalize">{level === 'easy' ? '初級' : level === 'normal' ? '中級' : '上級'}</h3>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+
+            return (
+                <div className="flex h-screen bg-slate-50 font-sans">
+                    {/* Sidebar */}
+                    <aside className="w-24 md:w-72 border-r bg-white/50 backdrop-blur-xl z-10 flex flex-col">
+                        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 overflow-y-auto scroll-smooth">
+                        <div className="max-w-5xl mx-auto p-6 md:p-16">
+                            {activeTab === 'dashboard' && <Dashboard />}
+                            {activeTab === 'game' && <Training />}
+                            {activeTab === 'saved' && (
+                                <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                                        <LucideIcon name="bookmark" size={40} />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-slate-400">保存された単語はありません</h2>
+                                    <p className="text-slate-400 mt-2">単語を検索して、ライブラリに追加しましょう。</p>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
