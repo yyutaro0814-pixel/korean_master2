@@ -1,9 +1,8 @@
-// @ts-nocheck
-// 'use server' を削除しました
+'use server';
 
+import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-// スキーマ（定義）はビルドのために残しておきます
 const FetchKoreanWordDefinitionInputSchema = z.object({
   word: z.string().describe('The Korean word (or phrase) to look up.'),
 });
@@ -27,8 +26,28 @@ const FetchKoreanWordDefinitionOutputSchema = z.object({
 
 export type KoreanWordDefinition = z.infer<typeof FetchKoreanWordDefinitionOutputSchema>;
 
-// ビルドエラーを防ぐため、実際のAI呼び出しを一旦コメントアウトするか、空を返すようにします
+const prompt = ai.definePrompt({
+  name: 'fetchKoreanWordDefinitionPrompt',
+  input: { schema: FetchKoreanWordDefinitionInputSchema },
+  output: { schema: FetchKoreanWordDefinitionOutputSchema },
+  prompt: `あなたは優秀な韓国語・日本語のバイリンガル辞書編集者です。
+韓国語の単語 '{{{word}}}' について、詳細な定義を日本語で提供してください。
+出力は指定されたJSONスキーマに従ってください。
+
+- phonetic: その単語のカタカタ読み（例：アニョハセヨ）
+- partOfSpeech: 品詞（名詞、動詞、形容詞など）
+- definition: 日本語での意味
+- example: その単語を使った短い例文とその日本語訳
+- synonyms: 類義語あれば
+`,
+});
+
 export async function fetchKoreanWordDefinition(word: string): Promise<KoreanWordDefinition | null> {
-  console.log('Fetching:', word);
-  return null; 
+  try {
+    const { output } = await prompt({ word });
+    return output!;
+  } catch (error) {
+    console.error('Error fetching Korean word definition:', error);
+    return null;
+  }
 }

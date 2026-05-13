@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { SearchBox } from '@/components/SearchBox';
 import { DailyWord } from '@/components/DailyWord';
 import { Navigation } from '@/components/Navigation';
