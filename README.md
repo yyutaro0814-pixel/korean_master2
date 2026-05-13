@@ -1,11 +1,5 @@
-# ハングル・マスター (LexiLink)
+# Firebase Studio
 
-韓国語（ハングル）の語彙力を、AIとゲームで楽しく鍛える学習プラットフォーム。
+This is a NextJS starter in Firebase Studio.
 
-## 主な機能
-- **単語検索と定義**: 韓国語単語の定義、読み、AIによる例文生成。
-- **トレーニング（単語キャッチャー）**: ゲーム形式で語彙を楽しく復習。
-- **保存機能**: 気になる単語を自分だけのライブラリに保存。
-
-## 開発
-このプロジェクトは Next.js 15 で構築されています。
+To get started, take a look at src/app/page.tsx.
