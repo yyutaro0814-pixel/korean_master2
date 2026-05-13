@@ -89,7 +89,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               <h1 className="text-5xl font-black text-foreground">{definition.word}</h1>
               <div className="flex items-center gap-4 text-secondary">
                 <span className="text-xl font-medium font-body">{definition.phonetic}</span>
-                {definition.phonetics.some(p => p.audio) && (
+                {definition.phonetics.some((p: any) => p.audio) && (
                   <Button size="icon" variant="ghost" className="rounded-full bg-secondary/10 hover:bg-secondary/20" onClick={playAudio}>
                     <Volume2 className="w-5 h-5 text-secondary" />
                   </Button>
