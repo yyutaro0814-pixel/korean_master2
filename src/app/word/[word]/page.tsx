@@ -1,16 +1,6 @@
 // @ts-nocheck
 "use client";
 
-import { useEffect, useState } from "react";
-// ...（以下、他のインポートが続く）
-
-"use client";
-
-import { useEffect, useState } from "react";
-// ...（以下、他のインポートが続く）
-
-"use client";
-
 import { useEffect, useState, use } from 'react';
 import { fetchWordDefinition, WordDefinition } from '@/lib/dictionary';
 import { Navigation } from '@/components/Navigation';
@@ -44,8 +34,8 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       saveWord(wordParam);
     }
   };
-    const playAudio = () => {
-    // どんなデータが来てもエラーにしない「any」を使ってチェックを回避します
+
+  const playAudio = () => {
     const phoneticWithAudio = definition?.phonetics?.find((p: any) => p.audio);
     const audioUrl = (phoneticWithAudio as any)?.audio;
     
@@ -53,9 +43,6 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       new Audio(audioUrl).play();
     }
   };
-
-
-  
 
   if (loading) {
     return (
@@ -100,7 +87,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               <h1 className="text-5xl font-black text-foreground">{definition.word}</h1>
               <div className="flex items-center gap-4 text-secondary">
                 <span className="text-xl font-medium font-body">{definition.phonetic}</span>
-                {definition.phonetics.some((p: any) => p.audio) && (
+                {definition.phonetics?.some((p: any) => p.audio) && (
                   <Button size="icon" variant="ghost" className="rounded-full bg-secondary/10 hover:bg-secondary/20" onClick={playAudio}>
                     <Volume2 className="w-5 h-5 text-secondary" />
                   </Button>
@@ -122,7 +109,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           </header>
 
           <section className="space-y-8">
-            {definition.meanings.map((meaning, mIdx) => (
+            {definition.meanings?.map((meaning, mIdx) => (
               <div key={mIdx} className="space-y-6 p-8 rounded-3xl bg-white shadow-sm border border-accent/30">
                 <Badge variant="secondary" className="px-4 py-1 text-sm rounded-lg font-bold">
                   {meaning.partOfSpeech === "noun" ? "名詞" : 
@@ -132,7 +119,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 </Badge>
                 
                 <div className="space-y-6">
-                  {meaning.definitions.map((def, dIdx) => (
+                  {meaning.definitions?.map((def, dIdx) => (
                     <div key={dIdx} className="space-y-2">
                       <p className="text-lg leading-relaxed text-foreground font-medium">
                         {meaning.definitions.length > 1 && <span className="text-muted-foreground mr-2">{dIdx + 1}.</span>}
@@ -147,7 +134,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                   ))}
                 </div>
 
-                {meaning.synonyms.length > 0 && (
+                {meaning.synonyms?.length > 0 && (
                   <div className="pt-4 flex flex-wrap gap-2 items-center">
                     <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground mr-2">類義語:</span>
                     {meaning.synonyms.slice(0, 5).map((syn, sIdx) => (
@@ -171,6 +158,3 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     </div>
   );
 }
-
-　
-
